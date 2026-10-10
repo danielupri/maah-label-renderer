@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MAAH Label Renderer — Complete V1 Documentation</title>
+  <style>
+    :root {
+      --bg: #f4f4f1;
+      --panel: #ffffff;
+      --text: #1d1d1f;
+      --muted: #666a70;
+      --line: #deded8;
+      --soft: #efefe9;
+      --nav: #ecece6;
+      --good: #2f6f49;
+      --warn: #8a6318;
+      --danger: #8a3434;
+      --info: #315e7a;
+      --code: #171717;
+      --code-text: #f2f2ee;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.62;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 290px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    aside {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      padding: 28px 22px;
+      border-right: 1px solid var(--line);
+      background: var(--nav);
+      overflow-y: auto;
+    }
+
+    aside h1 {
+      font-size: 18px;
+      line-height: 1.25;
+      margin: 0 0 6px;
+      letter-spacing: 0.02em;
+    }
+
+    aside .version {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 22px;
+    }
+
+    nav a {
+      display: block;
+      color: var(--text);
+      text-decoration: none;
+      padding: 6px 9px;
+      border-radius: 6px;
+      font-size: 13.5px;
+      margin-bottom: 1px;
+    }
+
+    nav a:hover { background: #deded6; }
+
+    main {
+      max-width: 1200px;
+      width: 100%;
+      padding: 46px 56px 80px;
+    }
+
+    header.hero {
+      padding: 36px 38px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      margin-bottom: 28px;
+    }
+
+    .eyebrow {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .13em;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    header.hero h2 {
+      font-size: 34px;
+      line-height: 1.15;
+      margin: 8px 0 12px;
+    }
+
+    header.hero p {
+      max-width: 900px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 30px 32px;
+      margin: 0 0 22px;
+    }
+
+    section h2 {
+      font-size: 24px;
+      margin: 0 0 13px;
+    }
+
+    section h3 {
+      font-size: 18px;
+      margin: 26px 0 9px;
+    }
+
+    section h4 {
+      font-size: 15px;
+      margin: 20px 0 6px;
+    }
+
+    p { margin: 8px 0 13px; }
+    ul, ol { padding-left: 23px; }
+    li { margin: 5px 0; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      background: #fafaf8;
+      border-radius: 10px;
+      padding: 16px 18px;
+    }
+
+    .card strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    code {
+      font-family: Consolas, "Courier New", monospace;
+      background: #ededeb;
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-size: .94em;
+    }
+
+    pre {
+      background: var(--code);
+      color: var(--code-text);
+      border-radius: 10px;
+      padding: 17px 19px;
+      overflow-x: auto;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 13px;
+      line-height: 1.56;
+    }
+
+    pre code {
+      background: transparent;
+      padding: 0;
+      color: inherit;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+
+    th, td {
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+      padding: 10px 9px;
+    }
+
+    th {
+      background: var(--soft);
+      font-weight: 650;
+    }
+
+    .note, .warning, .good, .danger, .info {
+      border-left: 4px solid #7b7b72;
+      background: #f6f6f1;
+      padding: 12px 14px;
+      margin: 15px 0;
+      border-radius: 4px;
+    }
+
+    .warning {
+      border-left-color: var(--warn);
+      background: #fbf6ea;
+    }
+
+    .good {
+      border-left-color: var(--good);
+      background: #eef7f1;
+    }
+
+    .danger {
+      border-left-color: var(--danger);
+      background: #fbefef;
+    }
+
+    .info {
+      border-left-color: var(--info);
+      background: #eef5f9;
+    }
+
+    .flow {
+      white-space: pre-wrap;
+      font-family: Consolas, "Courier New", monospace;
+      background: #f3f3ef;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 18px;
+      line-height: 1.55;
+    }
+
+    .tag {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 2px 8px;
+      margin-right: 5px;
+      background: #f5f5f2;
+    }
+
+    footer {
+      color: var(--muted);
+      font-size: 13px;
+      padding: 6px 4px;
+    }
+
+    @media (max-width: 950px) {
+      .layout { display: block; }
+      aside {
+        position: static;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--line);
+      }
+      nav { columns: 2; }
+      main { padding: 26px 18px 60px; }
+      .grid, .grid-3 { grid-template-columns: 1fr; }
+    }
+
+    @media print {
+      aside { display: none; }
+      .layout { display: block; }
+      main { max-width: none; padding: 0; }
+      section, header.hero { border-color: #bbb; }
+      body { background: white; }
+      pre { white-space: pre-wrap; }
+    }
+  </style>
+</head>
+<body>
+<div class="layout">
+
+  <aside>
+    <h1>MAAH Label Renderer</h1>
+    <div class="version">V1 — Complete Technical & Operational Documentation</div>
+    <nav>
+      <a href="#purpose">1. Purpose & Scope</a>
+      <a href="#architecture">2. Architecture</a>
+      <a href="#installation">3. Installation & Environment</a>
+      <a href="#standalone-install">4. Standalone Setup</a>
+      <a href="#gui">5. GUI Reference</a>
+      <a href="#svg-standard">6. SVG Artwork Standard</a>
+      <a href="#svg-ids">7. SVG IDs — Detailed Guide</a>
+      <a href="#json">8. JSON Contract</a>
+      <a href="#mapping">9. Mapping System</a>
+      <a href="#artwork-settings">10. Artwork Settings</a>
+      <a href="#formats">11. Avery Formats</a>
+      <a href="#rendering">12. Rendering & Layout</a>
+      <a href="#validation">13. Validation & Safeguards</a>
+      <a href="#files">14. Project Structure</a>
+      <a href="#modules">15. Python Modules</a>
+      <a href="#build">16. Build System</a>
+      <a href="#recovery">17. Recovery & Defaults</a>
+      <a href="#operations">18. Production Workflow</a>
+      <a href="#troubleshooting">19. Troubleshooting</a>
+      <a href="#maintenance">20. Maintenance Rules</a>
+      <a href="#limitations">21. V1 Boundaries</a>
+      <a href="#acceptance">22. V1 Acceptance Checklist</a>
+    </nav>
+  </aside>
+
+  <main>
+
+    <header class="hero">
+      <div class="eyebrow">Internal Technical Documentation</div>
+      <h2>MAAH Label Renderer</h2>
+      <p>
+        Complete V1 reference for installation, development, standalone deployment,
+        SVG template preparation, JSON mapping, artwork defaults, Avery sheet geometry,
+        printer calibration, validation, PDF generation, build behavior, recovery and
+        day-to-day production use.
+      </p>
+    </header>
+
+    <section id="purpose">
+      <h2>1. Purpose & Scope</h2>
+      <p>
+        MAAH Label Renderer is a local Windows application that transforms a normalized
+        MAAH SYSTEM label-job JSON file and a reusable SVG artwork template into printable
+        Avery A4 sheet layouts and PDF files. The renderer is deliberately separated from
+        the business database: it consumes exported data instead of connecting directly to
+        Google Sheets, Apps Script, Odoo or any other ERP.
+      </p>
+
+      <div class="grid">
+        <div class="card"><strong>JSON = production data</strong><span class="small">Product, lot, label and print information supplied by MAAH SYSTEM.</span></div>
+        <div class="card"><strong>SVG = artwork</strong><span class="small">Reusable transparent design containing explicitly identified dynamic text fields.</span></div>
+        <div class="card"><strong>Mapping = data binding</strong><span class="small">Connects each dynamic SVG text ID to one scalar JSON path.</span></div>
+        <div class="card"><strong>Label format = physical geometry</strong><span class="small">Defines Avery label size, rows, columns, margins, pitch and calibration defaults.</span></div>
+        <div class="card"><strong>Artwork settings = visual placement</strong><span class="small">Controls uniform artwork scale, solid background color and background bleed.</span></div>
+        <div class="card"><strong>Inkscape = PDF engine</strong><span class="small">The renderer produces SVG; Inkscape CLI performs the final SVG-to-PDF conversion.</span></div>
+      </div>
+
+      <div class="good">
+        V1 is intentionally narrow: reliable label rendering, not ERP functionality, not a graphical label designer and not a direct database client.
+      </div>
+    </section>
+
+    <section id="architecture">
+      <h2>2. Architecture</h2>
+
+      <div class="flow">MAAH SYSTEM
+    ↓
+Normalized Label Job JSON
+    +
+Transparent Square SVG Artwork
+    +
+Saved SVG-ID → JSON-Path Mapping
+    +
+Artwork Settings
+    +
+Avery Format Geometry
+    ↓
+Validation
+    ↓
+Dynamic Artwork SVG
+    ↓
+Background + Bleed + Uniform Artwork Scale
+    ↓
+A4 Avery Sheet SVG(s)
+    ↓
+Inkscape CLI
+    ↓
+Print PDF(s)</div>
+
+      <h3>Separation of responsibilities</h3>
+      <table>
+        <tr><th>Layer</th><th>Responsibility</th><th>Must not do</th></tr>
+        <tr><td>MAAH SYSTEM</td><td>Own production/business data and export the normalized job.</td><td>Render artwork or know Inkscape internals.</td></tr>
+        <tr><td>JSON</td><td>Act as the explicit data contract.</td><td>Contain graphical layout logic.</td></tr>
+        <tr><td>SVG template</td><td>Own visual design and text styling.</td><td>Encode Avery sheet geometry.</td></tr>
+        <tr><td>Mapping</td><td>Bind dynamic SVG IDs to JSON paths.</td><td>Store visual settings or printer calibration.</td></tr>
+        <tr><td>Artwork settings</td><td>Store scale, background and bleed defaults.</td><td>Store JSON field mappings.</td></tr>
+        <tr><td>Label formats</td><td>Own physical sheet geometry and format calibration.</td><td>Own artwork content.</td></tr>
+        <tr><td>Renderer</td><td>Resolve fields, create sheet SVGs and request PDF export.</td><td>Modify the master SVG template.</td></tr>
+      </table>
+    </section>
+
+    <section id="installation">
+      <h2>3. Development Installation & Environment Setup</h2>
+
+      <p>
+        This section is for a development or maintenance computer where the source project
+        is edited and rebuilt. The compiled standalone application does <strong>not</strong>
+        require Python; see the next section for standalone deployment.
+      </p>
+
+      <h3>3.1 Supported / tested environment</h3>
+      <p>
+        The current V1 project has been developed and tested on Windows using 64-bit CPython
+        3.14 and PyInstaller. The exact Python installation path is not part of the application
+        contract; the project uses its local <code>.venv</code> once created.
+      </p>
+
+      <h3>3.2 Required software</h3>
+      <table>
+        <tr><th>Component</th><th>Purpose</th><th>Required where?</th></tr>
+        <tr><td>Python 3.x 64-bit</td><td>Runs source code and build tooling.</td><td>Development/build computer only.</td></tr>
+        <tr><td>Tkinter / Tcl-Tk</td><td>Desktop GUI.</td><td>Included with the normal official Windows Python installation used by this project.</td></tr>
+        <tr><td>PyInstaller</td><td>Builds the Windows standalone application.</td><td>Development/build computer only.</td></tr>
+        <tr><td>Inkscape</td><td>Converts generated SVG sheets to PDF through the command line.</td><td>Development computer and every standalone production computer that must generate PDFs.</td></tr>
+      </table>
+
+      <div class="info">
+        The current V1 runtime code is designed around Python standard-library modules plus the project's own Python modules. PyInstaller is a build dependency, not a normal application runtime dependency.
+      </div>
+
+      <h3>3.3 Install Python</h3>
+      <p>
+        Install an official 64-bit Python build for Windows. During installation, ensure that
+        the standard Tcl/Tk components are included. After installation, verify Python from
+        PowerShell:
+      </p>
+
+      <pre><code>python --version
+python -c "import sys; print(sys.executable); print(sys.version)"</code></pre>
+
+      <p>If <code>python</code> is not on PATH, the Windows Python launcher can also be checked:</p>
+      <pre><code>py --version</code></pre>
+
+      <h3>3.4 Verify Tkinter before continuing</h3>
+      <pre><code>python -c "import tkinter; print('Tkinter OK - Tk', tkinter.TkVersion)"</code></pre>
+      <p>A version number confirms that the GUI dependency is available.</p>
+
+      <h3>3.5 Create the project virtual environment</h3>
+      <p>Open PowerShell in the project root:</p>
+      <pre><code>python -m venv .venv
+.\.venv\Scripts\Activate.ps1</code></pre>
+
+      <p>If PowerShell blocks local activation scripts for the current session:</p>
+      <pre><code>Set-ExecutionPolicy -Scope Process Bypass
+.\.venv\Scripts\Activate.ps1</code></pre>
+
+      <p>Verify that the active interpreter is the virtual environment:</p>
+      <pre><code>python -c "import sys; print(sys.executable)"</code></pre>
+
+      <h3>3.6 Install build dependency</h3>
+      <pre><code>python -m pip install --upgrade pip
+python -m pip install pyinstaller
+python -m PyInstaller --version</code></pre>
+
+      <h3>3.7 Verify project Python modules</h3>
+      <p>From the project root with the virtual environment active:</p>
+      <pre><code>python -c "import json_loader, svg_loader, mapping_store, template_settings_store, validator, renderer, label_formats, sheet_layout, inkscape_exporter; print('Project modules: OK')"</code></pre>
+
+      <p>If this fails, check that all project <code>.py</code> files are present in the same project root as <code>app.py</code>.</p>
+
+      <h3>3.8 Install and verify Inkscape</h3>
+      <p>
+        Install Inkscape normally on Windows. The renderer can use an explicitly configured
+        executable path or attempt to discover Inkscape from PATH and common Windows install locations.
+      </p>
+
+      <p>Typical direct verification:</p>
+      <pre><code>&amp; "C:\Program Files\Inkscape\bin\inkscape.exe" --version</code></pre>
+
+      <p>If Inkscape is available on PATH:</p>
+      <pre><code>inkscape --version</code></pre>
+
+      <p>An explicit path can be set in <code>config.json</code>:</p>
+      <pre><code>{
+  "schemaVersion": "1.0",
+  "appVersion": "1.0.0",
+  "inkscape": {
+    "executablePath": "C:\\Program Files\\Inkscape\\bin\\inkscape.exe"
+  }
+}</code></pre>
+
+      <div class="note">
+        The current artwork Scale / Background / Bleed defaults are controlled by <code>template_settings.json</code>, not by <code>config.json</code>. If older <code>defaults</code> keys still exist in <code>config.json</code>, they are not the authoritative visual-default system in the current V1 architecture.
+      </div>
+
+      <h3>3.9 Run the source application</h3>
+      <pre><code>python app.py</code></pre>
+
+      <h3>3.10 Development preflight checklist</h3>
+      <table>
+        <tr><th>Check</th><th>Expected result</th></tr>
+        <tr><td><code>python --version</code></td><td>Valid Python 3 installation.</td></tr>
+        <tr><td>Tkinter import</td><td>Prints Tk version without error.</td></tr>
+        <tr><td><code>.venv</code></td><td>Local virtual environment exists and activates.</td></tr>
+        <tr><td>PyInstaller</td><td><code>python -m PyInstaller --version</code> succeeds.</td></tr>
+        <tr><td>Project module import</td><td>Prints <code>Project modules: OK</code>.</td></tr>
+        <tr><td>Inkscape CLI</td><td>Version command succeeds.</td></tr>
+        <tr><td><code>python app.py</code></td><td>GUI starts without import/config errors.</td></tr>
+      </table>
+    </section>
+
+    <section id="standalone-install">
+      <h2>4. Standalone Production Setup</h2>
+
+      <p>
+        A production computer does not need Python, the virtual environment, PyInstaller,
+        VS Code or the source <code>.py</code> files. It does need the complete PyInstaller
+        distribution folder and Inkscape if PDF generation is required.
+      </p>
+
+      <h3>4.1 Copy the complete folder</h3>
+      <pre><code>MAAH Label Renderer/
+├── MAAH Label Renderer.exe
+├── _internal/
+├── config.json
+├── mappings.json
+├── template_settings.json
+├── template_settings.default.json
+├── label_formats.json
+├── label_formats.default.json
+├── maah.ico
+├── MAAH_Label_Renderer_Documentation.html
+├── README_LABEL_FORMATS.txt
+├── input/
+├── templates/
+└── output/</code></pre>
+
+      <div class="danger">
+        Do not distribute or move only <code>MAAH Label Renderer.exe</code>. V1 is intentionally built with PyInstaller <code>--onedir</code>, so the executable depends on the rest of the distribution directory, especially <code>_internal/</code> and the external configuration files.
+      </div>
+
+      <h3>4.2 Install Inkscape on the production computer</h3>
+      <p>
+        Without Inkscape, the application can still load and validate its own inputs, but
+        final PDF export cannot complete. Install Inkscape and verify the executable path.
+      </p>
+
+      <h3>4.3 Fonts are an external visual dependency</h3>
+      <p>
+        Any font used by dynamic SVG text must exist on the computer performing the Inkscape
+        export. Missing fonts can change text metrics and appearance. Static decorative text
+        may be converted to paths in the SVG when appropriate, but dynamic <code>field_*</code>
+        text must remain real SVG text so the renderer can replace its content.
+      </p>
+
+      <h3>4.4 First standalone test</h3>
+      <ol>
+        <li>Start <code>MAAH Label Renderer.exe</code>.</li>
+        <li>Browse a JSON job; the browser should open in <code>input/</code>.</li>
+        <li>Browse an SVG; the browser should open in <code>templates/</code>.</li>
+        <li>Confirm a saved mapping loads or create one.</li>
+        <li>Validate the job.</li>
+        <li>Generate labels.</li>
+        <li>Confirm SVG and PDF outputs appear in <code>output/</code>.</li>
+        <li>Close and reopen the application to confirm persistent settings remain available.</li>
+      </ol>
+    </section>
+
+    <section id="gui">
+      <h2>5. GUI Reference</h2>
+
+      <h3>5.1 Files</h3>
+      <table>
+        <tr><th>Control</th><th>Behavior</th></tr>
+        <tr><td>JSON</td><td>Selects a label-job JSON. The file browser opens in <code>input/</code> when that folder exists.</td></tr>
+        <tr><td>Artwork SVG</td><td>Selects the square source artwork. The file browser opens in <code>templates/</code> when available.</td></tr>
+        <tr><td>Output Folder</td><td>Selects the destination for rendered artwork, A4 sheet SVGs and PDFs. The browser starts from <code>output/</code>.</td></tr>
+      </table>
+
+      <h3>5.2 Mapping</h3>
+      <p>
+        After an SVG is loaded, the GUI detects every valid dynamic text ID and displays one
+        row per field. The JSON Field dropdown lists scalar JSON paths from the currently loaded
+        job. Value Preview shows the actual resolved value before rendering.
+      </p>
+      <p><strong>Save Mapping</strong> writes the current SVG-ID → JSON-path assignment to <code>mappings.json</code>.</p>
+
+      <h3>5.3 Print Layout</h3>
+      <table>
+        <tr><th>Control</th><th>Function</th></tr>
+        <tr><td>Format</td><td>Select an active Avery format from <code>label_formats.json</code>.</td></tr>
+        <tr><td>Dimensions</td><td>Read-only physical width × height for the selected label.</td></tr>
+        <tr><td>Quantity</td><td>Total label count.</td></tr>
+        <tr><td>Start Position</td><td>First usable slot on page 1, allowing partially used sheets.</td></tr>
+        <tr><td>Offset X / Y</td><td>Temporary whole-layout printer shift in millimeters.</td></tr>
+        <tr><td>Pitch X / Y Adjust</td><td>Temporary progressive spacing correction in millimeters.</td></tr>
+      </table>
+
+      <h3>5.4 Artwork / Background</h3>
+      <table>
+        <tr><th>Control</th><th>Function</th></tr>
+        <tr><td>Artwork Scale (%)</td><td>Uniform scale of the square artwork relative to the smallest label dimension.</td></tr>
+        <tr><td>Background Color</td><td>Solid <code>#RRGGBB</code> background generated by the application.</td></tr>
+        <tr><td>Choose Color</td><td>Native color picker that writes a valid HEX value.</td></tr>
+        <tr><td>Color Swatch</td><td>Visual preview of the current valid background color.</td></tr>
+        <tr><td>Bleed (mm)</td><td>Expands only the generated background beyond the nominal label boundary.</td></tr>
+      </table>
+
+      <h3>5.5 Artwork-settings buttons</h3>
+      <table>
+        <tr><th>Button</th><th>Persistent?</th><th>Behavior</th></tr>
+        <tr><td>Save Artwork Defaults</td><td>Yes</td><td>Saves current Scale / Color / Bleed for the selected SVG filename.</td></tr>
+        <tr><td>Use Artwork Defaults</td><td>No</td><td>Reloads the selected artwork's saved values; if none exist, loads Global Defaults.</td></tr>
+        <tr><td>Remove Artwork Defaults</td><td>Yes</td><td>After confirmation, deletes only the selected artwork override and loads Global Defaults.</td></tr>
+        <tr><td>Save Global Defaults</td><td>Yes</td><td>Saves current Scale / Color / Bleed as the global fallback.</td></tr>
+        <tr><td>Use Global Defaults</td><td>No</td><td>Loads saved global values into the GUI without deleting or changing artwork overrides.</td></tr>
+        <tr><td>Factory Defaults</td><td>No</td><td>Loads internal factory values <code>95 / #FFFFFF / 1.0</code> into the GUI without saving.</td></tr>
+      </table>
+
+      <h3>5.6 Main actions</h3>
+      <p>
+        <strong>Validate</strong> checks the complete current job without generating output.
+        <strong>Generate Labels</strong> validates first, renders dynamic artwork, creates one or
+        more A4 sheet SVGs and asks Inkscape to export corresponding PDFs.
+      </p>
+    </section>
+
+    <section id="svg-standard">
+      <h2>6. SVG Artwork Standard</h2>
+
+      <h3>6.1 Required conceptual format</h3>
+      <p>The preferred master artwork is:</p>
+      <pre><code>Format: SVG
+Aspect ratio: 1:1
+Background: transparent
+Preferred viewBox: 0 0 512 512
+Dynamic text: real SVG &lt;text&gt; elements
+Dynamic IDs: unique and beginning with field_</code></pre>
+
+      <p>
+        <code>512 × 512</code> is a design coordinate system, not a physical print size.
+        Physical millimeters are applied later by <code>sheet_layout.py</code> using the selected
+        Avery format.
+      </p>
+
+      <h3>6.2 Transparent artwork is deliberate</h3>
+      <p>
+        Do not bake the production background or bleed into the master artwork. V1 generates
+        a solid background separately, which allows the same artwork to be reused with different
+        background colors and bleed values without maintaining duplicate SVG files.
+      </p>
+
+      <h3>6.3 Embedded assets</h3>
+      <p>
+        For operational reliability, embed raster images and other external assets inside the SVG
+        whenever possible. Linked files can break when the template folder is copied to another
+        workstation.
+      </p>
+
+      <h3>6.4 Text and fonts</h3>
+      <p>
+        Dynamic fields must remain text. If they are converted to paths, the renderer can no longer
+        replace their content. Static logos or decorative text may be converted to paths if desired.
+        Fonts used by dynamic text should be installed on every computer that performs PDF export.
+      </p>
+    </section>
+
+    <section id="svg-ids">
+      <h2>7. SVG Dynamic IDs — Detailed Guide</h2>
+
+      <p>
+        SVG IDs are the core link between visual artwork and production data. The renderer does not
+        search for visible words such as “Product Name” or “Weight.” It searches the SVG XML for
+        <code>&lt;text&gt;</code> elements whose <code>id</code> begins with <code>field_</code>.
+      </p>
+
+      <h3>7.1 Naming rule</h3>
+      <pre><code>field_&lt;meaningful_name&gt;</code></pre>
+
+      <p>Recommended style:</p>
+      <pre><code>field_product_name
+field_frozen_status
+field_net_weight
+field_lot_id
+field_label_id</code></pre>
+
+      <p>Use lower-case snake_case after <code>field_</code>. This is not only cosmetic: consistent IDs make mappings readable and maintenance much safer.</p>
+
+      <h3>7.2 Concrete current JSON examples</h3>
+      <p>Given a job containing:</p>
+      <pre><code>{
+  "labelId": "LAB-0012",
+  "lot": {
+    "lotId": "L-261006-P001-001",
+    "productName": "Chicken Curry"
+  },
+  "product": {
+    "productId": "P001",
+    "productName": "Chicken Curry",
+    "labelName": "Chicken Curry",
+    "frozenStatus": "Tiefgefroren",
+    "netWeightG": 500,
+    "netWeightText": "500 g"
+  }
+}</code></pre>
+
+      <p>A template can use:</p>
+      <table>
+        <tr><th>SVG text ID</th><th>JSON path</th><th>Rendered example</th></tr>
+        <tr><td><code>field_product_name</code></td><td><code>product.labelName</code></td><td>Chicken Curry</td></tr>
+        <tr><td><code>field_frozen_status</code></td><td><code>product.frozenStatus</code></td><td>Tiefgefroren</td></tr>
+        <tr><td><code>field_net_weight</code></td><td><code>product.netWeightText</code></td><td>500 g</td></tr>
+        <tr><td><code>field_lot_id</code></td><td><code>lot.lotId</code></td><td>L-261006-P001-001</td></tr>
+        <tr><td><code>field_label_id</code></td><td><code>labelId</code></td><td>LAB-0012</td></tr>
+      </table>
+
+      <h3>7.3 What the SVG XML should conceptually contain</h3>
+      <pre><code>&lt;text
+    id="field_product_name"
+    x="256"
+    y="180"
+    text-anchor="middle"&gt;
+  &lt;tspan&gt;PRODUCT NAME&lt;/tspan&gt;
+&lt;/text&gt;</code></pre>
+
+      <p>
+        The placeholder text itself is irrelevant. The renderer uses the ID. At render time it replaces
+        the text content while preserving the existing element's position and styling.
+      </p>
+
+      <h3>7.4 How to assign IDs in Inkscape</h3>
+      <ol>
+        <li>Create the text object normally and style it exactly as desired.</li>
+        <li>Select that text object, not the surrounding group.</li>
+        <li>Open Inkscape's object properties / object ID controls or XML editor.</li>
+        <li>Set the object ID to a unique value beginning with <code>field_</code>.</li>
+        <li>Save the SVG.</li>
+        <li>Load it in MAAH Label Renderer and confirm the ID appears in the Mapping section.</li>
+      </ol>
+
+      <div class="warning">
+        The ID must belong to the actual SVG <code>&lt;text&gt;</code> element. Assigning <code>field_product_name</code> to a surrounding <code>&lt;g&gt;</code> group, rectangle or path does not make that object a dynamic text field.
+      </div>
+
+      <h3>7.5 Unique IDs are mandatory</h3>
+      <p>
+        Do not duplicate a dynamic ID in one SVG. Two separate objects cannot both be
+        <code>field_product_name</code>. The SVG loader validates ID uniqueness because ambiguous IDs
+        would make deterministic replacement impossible.
+      </p>
+
+      <h3>7.6 Dynamic text must not be converted to paths</h3>
+      <p>
+        Inkscape can convert text into vector paths. That is acceptable for static artwork but not
+        for dynamic fields. Once converted to a path, it is no longer a <code>&lt;text&gt;</code> object and
+        is therefore intentionally ignored by dynamic-field detection.
+      </p>
+
+      <h3>7.7 Tspan behavior</h3>
+      <p>
+        SVG text exported by Inkscape often contains one or more <code>&lt;tspan&gt;</code> children. The V1
+        renderer writes the resolved value into the first tspan and clears additional tspans to avoid
+        leaving stale placeholder fragments behind. For that reason, design each dynamic field as one
+        logical text value rather than manually splitting a single dynamic value across many tspans.
+      </p>
+
+      <h3>7.8 V1 does not auto-fit long text</h3>
+      <p>
+        The renderer preserves the template's font size and styling. It does not automatically shrink
+        text to fit. A product name that is much longer than the design placeholder can overflow its
+        intended area. Template design and upstream label text should therefore be tested with realistic
+        maximum lengths.
+      </p>
+
+      <h3>7.9 Static text is unaffected</h3>
+      <p>
+        Text that does not use a <code>field_</code> ID remains static. It can have a normal Inkscape ID,
+        another custom ID or no meaningful custom ID at all.
+      </p>
+
+      <h3>7.10 Filename uniqueness matters</h3>
+      <p>
+        Both <code>mappings.json</code> and artwork-specific entries in <code>template_settings.json</code>
+        are keyed by the SVG <strong>filename</strong>, not by the full folder path. Therefore operational
+        template filenames must be unique.
+      </p>
+      <pre><code>GOOD:
+maah_front_default.svg
+maah_back_default.svg
+kohitsune_front_default.svg
+
+RISKY:
+templates/brand_a/front_default.svg
+templates/brand_b/front_default.svg</code></pre>
+      <p>
+        In the risky case, both files share the key <code>front_default.svg</code> and could unintentionally
+        share/overwrite saved mapping or artwork-setting configuration.
+      </p>
+
+      <h3>7.11 Changing IDs after a mapping is saved</h3>
+      <p>
+        If an SVG template is edited and <code>field_*</code> IDs are renamed, added or removed, its saved
+        mapping may no longer match the artwork. Load the revised template, inspect every detected field,
+        update the mapping and press <strong>Save Mapping</strong> again.
+      </p>
+
+      <h3>7.12 Recommended ID checklist before approving a template</h3>
+      <table>
+        <tr><th>Check</th><th>Requirement</th></tr>
+        <tr><td>Prefix</td><td>Every dynamic text object begins with <code>field_</code>.</td></tr>
+        <tr><td>Element type</td><td>Dynamic object is actual SVG <code>&lt;text&gt;</code>, not a path/group.</td></tr>
+        <tr><td>Uniqueness</td><td>No duplicate IDs.</td></tr>
+        <tr><td>Naming</td><td>Descriptive lower-case snake_case.</td></tr>
+        <tr><td>Text layout</td><td>One logical dynamic value per text object.</td></tr>
+        <tr><td>Font</td><td>Required dynamic font is installed on production workstation.</td></tr>
+        <tr><td>Length test</td><td>Realistic long values do not overflow the intended design.</td></tr>
+        <tr><td>Filename</td><td>Template filename is unique across the operational template library.</td></tr>
+      </table>
+    </section>
+
+    <section id="json">
+      <h2>8. JSON Data Contract</h2>
+
+      <p>
+        JSON is the boundary between MAAH SYSTEM and the renderer. The renderer does not require direct
+        access to the upstream database as long as the exported JSON contains the fields needed by the
+        selected template and print job.
+      </p>
+
+      <h3>8.1 Current test / reference job</h3>
+      <pre><code>{
+  "schemaVersion": "1.0",
+  "labelId": "LAB-0012",
+  "brand": {
+    "title": "MAAH FOOD"
+  },
+  "lot": {
+    "lotId": "L-261006-P001-001",
+    "productName": "Chicken Curry"
+  },
+  "product": {
+    "productId": "P001",
+    "productName": "Chicken Curry",
+    "labelName": "Chicken Curry",
+    "frozenStatus": "Tiefgefroren",
+    "netWeightG": 500,
+    "netWeightText": "500 g"
+  },
+  "print": {
+    "formatCode": "L7976",
+    "quantity": 10,
+    "startPosition": 7,
+    "labelsPerSheet": 8
+  }
+}</code></pre>
+
+      <h3>8.2 Scalar mapping rule</h3>
+      <p>
+        V1 mapping is designed for scalar values such as strings and numbers. Objects and arrays are not
+        exposed as direct text values. If a future label needs a formatted ingredient list or similar
+        composite value, the upstream data contract should normally provide a ready-to-render scalar text
+        field rather than asking the SVG renderer to reconstruct business logic.
+      </p>
+
+      <h3>8.3 Print defaults loaded from JSON</h3>
+      <p>The GUI attempts to load these values when present:</p>
+      <pre><code>print.formatCode
+print.quantity
+print.startPosition</code></pre>
+      <p>They remain visible and can be reviewed before generation.</p>
+    </section>
+
+    <section id="mapping">
+      <h2>9. Mapping System</h2>
+
+      <p>Mapping direction is always:</p>
+      <pre><code>SVG dynamic text ID  →  JSON path</code></pre>
+
+      <p>Example:</p>
+      <pre><code>field_product_name   → product.labelName
+field_frozen_status  → product.frozenStatus
+field_net_weight     → product.netWeightText</code></pre>
+
+      <h3>9.1 Persistent structure</h3>
+      <pre><code>{
+  "schemaVersion": "1.0",
+  "templates": {
+    "front_default.svg": {
+      "field_product_name": "product.labelName",
+      "field_frozen_status": "product.frozenStatus",
+      "field_net_weight": "product.netWeightText"
+    }
+  }
+}</code></pre>
+
+      <h3>9.2 Why mapping is separate from the SVG</h3>
+      <p>
+        Keeping mapping outside the source artwork allows designers to work with reusable SVG templates
+        without embedding MAAH data-path knowledge into visible design content. It also lets mapping be
+        changed without editing the SVG file itself.
+      </p>
+
+      <h3>9.3 Mapping validation</h3>
+      <p>Before generation, V1 checks that:</p>
+      <ul>
+        <li>every detected dynamic SVG field has a mapping;</li>
+        <li>the mapping does not point to unknown dynamic IDs;</li>
+        <li>each mapped JSON path exists;</li>
+        <li>the resolved value is suitable as a scalar text value;</li>
+        <li>required values are not silently treated as valid when unusable.</li>
+      </ul>
+    </section>
+
+    <section id="artwork-settings">
+      <h2>10. Artwork Settings: Factory, Global and Template Defaults</h2>
+
+      <p>The visual-settings hierarchy is:</p>
+      <div class="flow">Artwork-specific defaults
+        ↓ if no override exists
+Global user defaults
+        ↓ if settings storage is unavailable / invalid
+Factory defaults</div>
+
+      <h3>10.1 Factory defaults</h3>
+      <pre><code>Artwork Scale: 95.0%
+Background:    #FFFFFF
+Bleed:         1.0 mm</code></pre>
+      <p>
+        Factory values are hardcoded in <code>template_settings_store.py</code>. They are the final internal
+        fallback and can still be loaded even if the editable settings JSON is unavailable.
+      </p>
+
+      <h3>10.2 Global defaults</h3>
+      <p>
+        Global defaults live in <code>template_settings.json</code> and are used by every SVG template that
+        does not have its own artwork-specific override.
+      </p>
+
+      <h3>10.3 Artwork-specific defaults</h3>
+      <p>
+        A template can override Scale / Background / Bleed. The override is keyed by template filename and
+        therefore has priority whenever that artwork is selected.
+      </p>
+
+      <h3>10.4 Working settings file</h3>
+      <pre><code>{
+  "schemaVersion": "1.0",
+  "global": {
+    "artworkScalePct": 95.0,
+    "backgroundColor": "#FFFFFF",
+    "bleedMm": 1.0
+  },
+  "templates": {
+    "maah_front.svg": {
+      "artworkScalePct": 88.0,
+      "backgroundColor": "#E8DCCB",
+      "bleedMm": 1.5
+    }
+  }
+}</code></pre>
+
+      <h3>10.5 Button semantics</h3>
+      <div class="flow">SAVE    = persistent write
+USE     = temporary read into GUI
+REMOVE  = persistent delete of one artwork override
+FACTORY = temporary load of internal fallback values</div>
+
+      <div class="warning">
+        <strong>Use Global Defaults</strong> never deletes the selected artwork override. It only places the global values into the current GUI fields. The saved artwork override remains available through <strong>Use Artwork Defaults</strong> unless explicitly removed with <strong>Remove Artwork Defaults</strong>.
+      </div>
+
+      <h3>10.6 Known-good default file</h3>
+      <p><code>template_settings.default.json</code> is the recovery baseline:</p>
+      <pre><code>{
+  "schemaVersion": "1.0",
+  "global": {
+    "artworkScalePct": 95.0,
+    "backgroundColor": "#FFFFFF",
+    "bleedMm": 1.0
+  },
+  "templates": {}
+}</code></pre>
+      <p>
+        This recovery file and the internal hardcoded Factory Defaults deliberately begin with the same values,
+        but they are different mechanisms: one is an external known-good file and the other is a code-level fallback.
+      </p>
+    </section>
+
+    <section id="formats">
+      <h2>11. Avery Label Formats</h2>
+
+      <p>
+        Physical label geometry is externalized in <code>label_formats.json</code>. Adding or correcting a format
+        normally does not require changing Python code.
+      </p>
+
+      <table>
+        <tr><th>Format</th><th>Label Size</th><th>Grid</th><th>Labels / Sheet</th></tr>
+        <tr><td>L7970</td><td>63.5 × 33.9 mm</td><td>3 × 8</td><td>24</td></tr>
+        <tr><td>L7976</td><td>99.1 × 67.7 mm</td><td>2 × 4</td><td>8</td></tr>
+        <tr><td>L7160</td><td>63.5 × 38.1 mm</td><td>3 × 7</td><td>21</td></tr>
+        <tr><td>L7161</td><td>63.5 × 46.6 mm</td><td>3 × 6</td><td>18</td></tr>
+        <tr><td>L7162</td><td>99.1 × 33.9 mm</td><td>2 × 8</td><td>16</td></tr>
+        <tr><td>L7163</td><td>99.1 × 38.1 mm</td><td>2 × 7</td><td>14</td></tr>
+        <tr><td>L7165</td><td>99.1 × 67.7 mm</td><td>2 × 4</td><td>8</td></tr>
+        <tr><td>L7166</td><td>99.1 × 93.1 mm</td><td>2 × 3</td><td>6</td></tr>
+      </table>
+
+      <div class="note">
+        L7976 and L7165 have the same nominal label size but different horizontal sheet geometry. They remain separate formats intentionally.
+      </div>
+
+      <h3>11.1 Geometry versus calibration</h3>
+      <p>
+        Geometry describes the physical label sheet. Calibration corrects the behavior of a specific printer/setup.
+        Default calibration can be stored in the format, while the GUI allows temporary per-run overrides.
+      </p>
+
+      <h3>11.2 Maintenance files</h3>
+      <pre><code>label_formats.json
+label_formats.default.json
+README_LABEL_FORMATS.txt
+validate_label_formats.py
+validate_label_formats.bat
+reset_label_formats.bat</code></pre>
+      <p>
+        The validator and reset BAT files are development/root maintenance tools and are intentionally not part of
+        the standalone production package. The known-good <code>label_formats.default.json</code> is copied into the distribution as a reference/recovery asset.
+      </p>
+    </section>
+
+    <section id="rendering">
+      <h2>12. Rendering & Physical Layout</h2>
+
+      <h3>12.1 Uniform artwork scaling</h3>
+      <pre><code>BaseSize = min(LabelWidth, LabelHeight)
+ArtworkSize = BaseSize × ArtworkScalePct / 100
+
+ArtworkX = LabelX + (LabelWidth - ArtworkSize) / 2
+ArtworkY = LabelY + (LabelHeight - ArtworkSize) / 2</code></pre>
+      <p>
+        Artwork is never stretched non-uniformly. A square master remains square. Values above 100% are allowed,
+        and artwork is clipped to the nominal label area.
+      </p>
+
+      <h3>12.2 Background and bleed</h3>
+      <pre><code>BackgroundX = LabelX - Bleed
+BackgroundY = LabelY - Bleed
+BackgroundW = LabelWidth  + 2 × Bleed
+BackgroundH = LabelHeight + 2 × Bleed</code></pre>
+      <p>
+        Bleed affects only the generated solid background. All backgrounds are inserted before artwork so that an
+        overlapping bleed area cannot paint over a neighboring label's artwork.
+      </p>
+
+      <h3>12.3 A4 coordinate system</h3>
+      <p>
+        Sheet SVGs use A4 physical dimensions: <code>210 mm × 297 mm</code>, with an SVG viewBox of
+        <code>0 0 210 297</code>. Therefore one layout coordinate corresponds directly to one millimeter.
+      </p>
+
+      <h3>12.4 Printer calibration</h3>
+      <pre><code>X = MarginLeft + OffsetX + Column × (PitchX + PitchXAdjust)
+Y = MarginTop  + OffsetY + Row    × (PitchY + PitchYAdjust)</code></pre>
+      <p>
+        Offset corrects constant global displacement. Pitch adjustment corrects an error that grows progressively from
+        one row/column to the next. They solve different physical problems and should not be used interchangeably.
+      </p>
+
+      <h3>12.5 Start position and multi-page planning</h3>
+      <p>
+        The first page can begin on a partially used sheet. Example: L7976, quantity 10, start position 7 results in
+        page 1 using slots 7–8 and page 2 using slots 1–8.
+      </p>
+
+      <h3>12.6 Output naming</h3>
+      <p>Base filename:</p>
+      <pre><code>lotId__labelId__role</code></pre>
+      <p>Example:</p>
+      <pre><code>L-261006-P001-001__LAB-0012__test.svg
+L-261006-P001-001__LAB-0012__test__L7976__page_01.svg
+L-261006-P001-001__LAB-0012__test__L7976__page_01.pdf</code></pre>
+      <p>The role is derived from the first filename segment before the first underscore.</p>
+
+      <div class="danger">
+        Final PDFs must be printed at <strong>100% / Actual Size</strong>. Do not use Fit to Page, Shrink, Scale to Printable Area or other printer-driver scaling if physical Avery alignment matters.
+      </div>
+    </section>
+
+    <section id="validation">
+      <h2>13. Validation & Safeguards</h2>
+
+      <div class="grid">
+        <div class="card"><strong>Explicit JSON boundary</strong><span class="small">No direct Python → Google Sheets dependency.</span></div>
+        <div class="card"><strong>Master SVG protection</strong><span class="small">Rendering reloads the template and writes a separate output file.</span></div>
+        <div class="card"><strong>Square artwork validation</strong><span class="small">Selected source artwork must satisfy the square-artwork rule.</span></div>
+        <div class="card"><strong>Unique SVG IDs</strong><span class="small">Duplicate IDs are rejected because replacement must be deterministic.</span></div>
+        <div class="card"><strong>Complete mapping</strong><span class="small">Every detected dynamic field must be assigned before production generation.</span></div>
+        <div class="card"><strong>JSON path resolution</strong><span class="small">Mapped paths must exist and resolve to usable scalar values.</span></div>
+        <div class="card"><strong>HEX background validation</strong><span class="small">Background colors must use valid <code>#RRGGBB</code> format.</span></div>
+        <div class="card"><strong>Scale and bleed validation</strong><span class="small">Invalid numeric values are rejected before output.</span></div>
+        <div class="card"><strong>Format validation</strong><span class="small">Quantity/start position and label geometry are checked before sheet generation.</span></div>
+        <div class="card"><strong>Inkscape detection</strong><span class="small">PDF export fails visibly when a valid Inkscape executable cannot be located.</span></div>
+        <div class="card"><strong>Safe settings writes</strong><span class="small">Artwork settings are written through a temporary file before replacing the working JSON.</span></div>
+        <div class="card"><strong>Explicit destructive action</strong><span class="small">Removing artwork defaults requires confirmation and removes only that template override.</span></div>
+      </div>
+
+      <h3>13.1 What validation does not guarantee</h3>
+      <p>
+        Software validation cannot prove that a physical printer feeds paper identically every time, that the selected
+        Avery stock matches the configuration, that all fonts visually match the design system, or that a long product name
+        fits aesthetically. A physical test print remains part of production setup.
+      </p>
+    </section>
+
+    <section id="files">
+      <h2>14. Project File & Folder Structure</h2>
+
+      <pre><code>MAAH_LABEL_RENDERER_V1/
+├── .venv/
+│
+├── app.py
+├── json_loader.py
+├── svg_loader.py
+├── mapping_store.py
+├── template_settings_store.py
+├── validator.py
+├── renderer.py
+├── label_formats.py
+├── sheet_layout.py
+├── inkscape_exporter.py
+│
+├── config.json
+├── mappings.json
+├── template_settings.json
+├── template_settings.default.json
+├── label_formats.json
+├── label_formats.default.json
+│
+├── README_LABEL_FORMATS.txt
+├── MAAH_Label_Renderer_Documentation.html
+│
+├── validate_label_formats.py
+├── validate_label_formats.bat
+├── reset_label_formats.bat
+├── reset_template_settings.bat
+├── build.bat
+├── maah.ico
+│
+├── input/
+├── templates/
+├── output/
+│
+├── build/        # generated by PyInstaller
+└── dist/         # generated standalone distribution</code></pre>
+
+      <table>
+        <tr><th>Path</th><th>Role</th></tr>
+        <tr><td><code>input/</code></td><td>Incoming JSON label jobs exported from MAAH SYSTEM.</td></tr>
+        <tr><td><code>templates/</code></td><td>Reusable transparent SVG master artworks.</td></tr>
+        <tr><td><code>output/</code></td><td>Generated dynamic artwork, sheet SVGs and PDFs.</td></tr>
+        <tr><td><code>mappings.json</code></td><td>Persistent SVG-ID → JSON-path mappings keyed by template filename.</td></tr>
+        <tr><td><code>template_settings.json</code></td><td>Persistent Global + artwork-specific Scale / Background / Bleed settings.</td></tr>
+        <tr><td><code>template_settings.default.json</code></td><td>Known-good recovery baseline for artwork settings.</td></tr>
+        <tr><td><code>label_formats.json</code></td><td>Working Avery physical geometry and default calibration.</td></tr>
+        <tr><td><code>label_formats.default.json</code></td><td>Known-good recovery baseline for label formats.</td></tr>
+        <tr><td><code>config.json</code></td><td>General application configuration, including optional Inkscape path.</td></tr>
+      </table>
+    </section>
+
+    <section id="modules">
+      <h2>15. Python Module Responsibilities</h2>
+
+      <table>
+        <tr><th>Module</th><th>Primary responsibility</th></tr>
+        <tr><td><code>app.py</code></td><td>Tkinter GUI, user actions, orchestration, default directory selection and end-to-end workflow.</td></tr>
+        <tr><td><code>json_loader.py</code></td><td>Load JSON, enumerate usable scalar paths and resolve values by dot path.</td></tr>
+        <tr><td><code>svg_loader.py</code></td><td>Load SVG XML, inspect viewBox, enforce square artwork and unique IDs, discover dynamic <code>field_*</code> text objects.</td></tr>
+        <tr><td><code>mapping_store.py</code></td><td>Validate, load, save and retrieve per-template SVG-ID → JSON-path mappings.</td></tr>
+        <tr><td><code>template_settings_store.py</code></td><td>Factory defaults, Global settings, per-artwork overrides, validation, normalization and safe persistence.</td></tr>
+        <tr><td><code>validator.py</code></td><td>Cross-check JSON + SVG + mapping and resolve render-ready values.</td></tr>
+        <tr><td><code>renderer.py</code></td><td>Reload the master SVG, replace dynamic text while preserving style/position and write dynamic artwork output.</td></tr>
+        <tr><td><code>label_formats.py</code></td><td>Load/validate label geometry, apply temporary calibration overrides and plan sheet slots/pages.</td></tr>
+        <tr><td><code>sheet_layout.py</code></td><td>Create physical A4 SVG sheets, backgrounds, bleed, clipping and artwork placement.</td></tr>
+        <tr><td><code>inkscape_exporter.py</code></td><td>Find Inkscape and perform SVG → PDF export through subprocess calls.</td></tr>
+      </table>
+
+      <div class="note">
+        This modular separation is intentional. Avoid collapsing all behavior into <code>app.py</code>; keeping data loading, validation, rendering, geometry and persistence isolated makes failures easier to diagnose and future changes safer.
+      </div>
+    </section>
+
+    <section id="build">
+      <h2>16. Build System</h2>
+
+      <h3>16.1 Build technology</h3>
+      <p>The production application is built with PyInstaller in <code>--onedir --windowed</code> mode.</p>
+      <pre><code>python -m PyInstaller --noconfirm --clean --windowed --onedir \
+  --name "MAAH Label Renderer" \
+  --icon "maah.ico" \
+  app.py</code></pre>
+
+      <p>The normal project workflow uses <code>build.bat</code>, which also preserves or restores operational files according to explicit rules.</p>
+
+      <h3>16.2 Current build preservation rules</h3>
+      <table>
+        <tr><th>Item</th><th>Behavior during rebuild</th></tr>
+        <tr><td><code>config.json</code></td><td>Always Project → Dist.</td></tr>
+        <tr><td><code>label_formats.json</code></td><td>Always Project → Dist.</td></tr>
+        <tr><td><code>label_formats.default.json</code></td><td>Always Project → Dist.</td></tr>
+        <tr><td><code>template_settings.default.json</code></td><td>Always Project → Dist.</td></tr>
+        <tr><td><code>maah.ico</code></td><td>Always Project → Dist; icon is also embedded into the EXE by PyInstaller.</td></tr>
+        <tr><td><code>MAAH_Label_Renderer_Documentation.html</code></td><td>Copied from Project when present.</td></tr>
+        <tr><td><code>README_LABEL_FORMATS.txt</code></td><td>Copied from Project when present.</td></tr>
+        <tr><td><code>mappings.json</code></td><td>Existing Dist copy is preserved; Project copy is used only when no previous production copy exists.</td></tr>
+        <tr><td><code>template_settings.json</code></td><td>Existing Dist copy is preserved; Project copy is used only when no previous production copy exists.</td></tr>
+        <tr><td><code>output/</code></td><td>Existing Dist contents are preserved.</td></tr>
+        <tr><td><code>input/</code></td><td>Build asks Keep existing production input or Restore from Project.</td></tr>
+        <tr><td><code>templates/</code></td><td>Build asks Keep existing production templates or Restore from Project.</td></tr>
+      </table>
+
+      <h3>16.3 What is intentionally not copied to Dist</h3>
+      <pre><code>validate_label_formats.py
+validate_label_formats.bat
+reset_label_formats.bat
+reset_template_settings.bat</code></pre>
+      <p>These remain project-root maintenance tools rather than production-distribution tools.</p>
+
+      <h3>16.4 Build procedure</h3>
+      <ol>
+        <li>Close <code>MAAH Label Renderer.exe</code> before rebuilding; Windows locks an open executable and can prevent <code>dist/</code> deletion.</li>
+        <li>Run <code>build.bat</code>.</li>
+        <li>If an existing production <code>input/</code> folder is found, choose Keep or Restore.</li>
+        <li>If an existing production <code>templates/</code> folder is found, choose Keep or Restore.</li>
+        <li>Wait for PyInstaller to finish.</li>
+        <li>The final distribution folder is opened automatically.</li>
+        <li>Run a production smoke test from the EXE, not only from <code>python app.py</code>.</li>
+      </ol>
+
+      <div class="warning">
+        If a build fails with <code>PermissionError: [WinError 5] Access is denied</code> inside <code>dist\MAAH Label Renderer</code>, first verify that the standalone application is closed. An open EXE commonly keeps the old distribution folder locked.
+      </div>
+
+      <h3>16.5 Windows icon cache</h3>
+      <p>
+        Windows Explorer can display an old icon for a rebuilt EXE even when PyInstaller embedded the correct icon.
+        Renaming the EXE and seeing the correct icon confirms that the executable itself is correct and Explorer is showing cached metadata.
+        This is not an application or build defect.
+      </p>
+    </section>
+
+    <section id="recovery">
+      <h2>17. Recovery & Known-Good Defaults</h2>
+
+      <h3>17.1 Label formats</h3>
+      <div class="flow">label_formats.default.json
+        ↓ reset_label_formats.bat
+label_formats.json
+        ↓ validate_label_formats.bat / validate_label_formats.py
+Validated working geometry</div>
+
+      <h3>17.2 Artwork settings</h3>
+      <div class="flow">template_settings.default.json
+        ↓ reset_template_settings.bat
+template_settings.json
+        ↓
+Global = 95 / #FFFFFF / 1.0
+Templates = none</div>
+
+      <div class="danger">
+        Recovery reset scripts are destructive by design. They replace working configuration with the known-good default version. Back up custom settings before running a reset if those settings must be retained.
+      </div>
+
+      <h3>17.3 Why both code-level Factory Defaults and a default JSON exist</h3>
+      <p>
+        <code>template_settings.default.json</code> is an external recovery reference. Hardcoded Factory Defaults in Python
+        are a final runtime fallback. Keeping both prevents one corrupted editable settings file from becoming a single point of failure.
+      </p>
+    </section>
+
+    <section id="operations">
+      <h2>18. Recommended Production Workflow</h2>
+
+      <ol>
+        <li>Export or place the normalized label-job JSON in <code>input/</code>.</li>
+        <li>Ensure the approved SVG template is in <code>templates/</code>.</li>
+        <li>Open MAAH Label Renderer.</li>
+        <li>Select the JSON. The browser should start in <code>input/</code>.</li>
+        <li>Select the SVG. The browser should start in <code>templates/</code>.</li>
+        <li>Review detected dynamic SVG IDs and Value Preview.</li>
+        <li>If the template is new or changed, create/review its mapping and press <strong>Save Mapping</strong>.</li>
+        <li>Confirm whether the artwork-specific or Global Scale / Background / Bleed values are correct.</li>
+        <li>Confirm the Avery format, displayed dimensions, quantity and start position.</li>
+        <li>Use Offset/Pitch adjustments only when a physical calibration test requires them.</li>
+        <li>Press <strong>Validate</strong>.</li>
+        <li>Resolve every validation error rather than bypassing it.</li>
+        <li>Press <strong>Generate Labels</strong>.</li>
+        <li>Review the generated sheet SVG/PDF in <code>output/</code>.</li>
+        <li>Print at <strong>100% / Actual Size</strong>.</li>
+        <li>For a new printer, label stock or format, perform a physical alignment test before production volume.</li>
+      </ol>
+    </section>
+
+    <section id="troubleshooting">
+      <h2>19. Troubleshooting</h2>
+
+      <table>
+        <tr><th>Symptom</th><th>Likely cause</th><th>Action</th></tr>
+        <tr><td>SVG field does not appear in Mapping</td><td>ID is missing, does not begin with <code>field_</code>, or is assigned to a non-text element.</td><td>Inspect the SVG object in Inkscape/XML editor and keep it as a real text object.</td></tr>
+        <tr><td>Mapping loads incorrectly for another design</td><td>Two templates share the same filename.</td><td>Rename templates so operational filenames are unique, then save mappings/settings again.</td></tr>
+        <tr><td>Validation says a dynamic field is missing</td><td>Template IDs changed or mapping is incomplete.</td><td>Review all mapping rows and save the mapping again.</td></tr>
+        <tr><td>Text appearance changes on another PC</td><td>Font missing or substituted by Inkscape/system.</td><td>Install the required font; keep dynamic fields as text.</td></tr>
+        <tr><td>Artwork is too large/small</td><td>Artwork Scale value is inappropriate for that template.</td><td>Load Global or Artwork Defaults, adjust and save only when the new value is intended to persist.</td></tr>
+        <tr><td>Wrong background after selecting SVG</td><td>An artwork-specific override has priority over Global.</td><td>Use Artwork Defaults to inspect it, or Remove Artwork Defaults if that override should no longer exist.</td></tr>
+        <tr><td>PDF export fails</td><td>Inkscape not installed or executable path cannot be found.</td><td>Verify Inkscape CLI and optionally configure the absolute path in <code>config.json</code>.</td></tr>
+        <tr><td>Labels drift progressively</td><td>Pitch mismatch, not simple offset.</td><td>Adjust Pitch X/Y carefully after measuring physical output.</td></tr>
+        <tr><td>Entire sheet is shifted equally</td><td>Global printer offset.</td><td>Adjust Offset X/Y instead of pitch.</td></tr>
+        <tr><td>Correct PDF but wrong physical dimensions</td><td>Printer driver scaling.</td><td>Print at 100% / Actual Size; disable Fit/Shrink scaling.</td></tr>
+        <tr><td>Build fails with WinError 5 in <code>dist</code></td><td>Standalone EXE or another file in the folder is open/locked.</td><td>Close the app and any process using the distribution folder, then rebuild.</td></tr>
+        <tr><td>EXE shows old icon in Explorer</td><td>Windows icon cache.</td><td>Confirm by renaming/copying the EXE. If the new name shows the correct icon, the binary is correct.</td></tr>
+      </table>
+    </section>
+
+    <section id="maintenance">
+      <h2>20. Maintenance Rules</h2>
+
+      <p>The following rules should be treated as architecture constraints unless a later version deliberately changes them:</p>
+      <ul>
+        <li>Do not add a direct Python-to-Google-Sheets dependency to V1.</li>
+        <li>Do not treat 512 SVG units as millimeters or physical pixels.</li>
+        <li>Do not change square artwork into Avery-sized source artwork.</li>
+        <li>Do not introduce non-uniform artwork stretching.</li>
+        <li>Do not bake background/bleed into the master artwork as a requirement.</li>
+        <li>Do not hardcode individual dynamic fields in Python; detection remains <code>field_*</code>-based.</li>
+        <li>Do not mix SVG mapping with visual artwork settings.</li>
+        <li>Do not mix Avery geometry with template design.</li>
+        <li>Do not silently persist temporary GUI calibration changes.</li>
+        <li>Do not delete production <code>mappings.json</code>, <code>template_settings.json</code> or <code>output/</code> during a normal build.</li>
+        <li>Do not move only the PyInstaller EXE out of its onedir distribution.</li>
+        <li>Do not add new V1 functionality without a concrete operational need; preserve a stable production baseline.</li>
+      </ul>
+    </section>
+
+    <section id="limitations">
+      <h2>21. V1 Boundaries</h2>
+
+      <p>The following are intentionally outside the current V1 scope:</p>
+      <ul>
+        <li>Direct Google Sheets, Apps Script, Odoo or ERP connectivity.</li>
+        <li>Graphical drag-and-drop label design.</li>
+        <li>Automatic modification of master SVG templates.</li>
+        <li>Non-uniform artwork stretching.</li>
+        <li>Automatic text fitting, font-size reduction or sophisticated text wrapping.</li>
+        <li>Complex renderer-generated gradients or design effects.</li>
+        <li>Automatic multi-page PDF merging.</li>
+        <li>Database-backed job history inside the renderer.</li>
+        <li>Bundling Inkscape into the PyInstaller package.</li>
+        <li>Installer deployment into protected Program Files locations.</li>
+      </ul>
+
+      <p>
+        These limitations are deliberate. V1 is optimized for a controlled internal production workflow with low complexity,
+        predictable files and transparent failure modes.
+      </p>
+    </section>
+
+    <section id="acceptance">
+      <h2>22. V1 Acceptance Checklist</h2>
+
+      <p>Before declaring a new build production-ready, verify all of the following:</p>
+      <table>
+        <tr><th>Area</th><th>Acceptance test</th></tr>
+        <tr><td>Startup</td><td>Standalone EXE starts from the complete <code>dist\MAAH Label Renderer\</code> folder.</td></tr>
+        <tr><td>JSON browser</td><td>Browse starts in <code>input/</code>.</td></tr>
+        <tr><td>SVG browser</td><td>Browse starts in <code>templates/</code>.</td></tr>
+        <tr><td>Output browser</td><td>Browse starts in <code>output/</code>.</td></tr>
+        <tr><td>Mapping</td><td>Saved mapping reloads for an existing template.</td></tr>
+        <tr><td>Mapping persistence</td><td>Changes survive application restart and rebuild.</td></tr>
+        <tr><td>Artwork override</td><td>Saved template-specific Scale / Color / Bleed load automatically.</td></tr>
+        <tr><td>Global fallback</td><td>A template without an override loads Global Defaults.</td></tr>
+        <tr><td>Use Global</td><td>Loads global values temporarily without deleting the artwork override.</td></tr>
+        <tr><td>Use Artwork</td><td>Reloads artwork values; if none exist, loads Global.</td></tr>
+        <tr><td>Remove Artwork</td><td>Deletes only the current override after confirmation and then loads Global.</td></tr>
+        <tr><td>Factory Defaults</td><td>Loads 95 / #FFFFFF / 1.0 without saving automatically.</td></tr>
+        <tr><td>Format</td><td>Selected Avery format displays correct physical dimensions.</td></tr>
+        <tr><td>Start position</td><td>Partially used first sheet is planned correctly.</td></tr>
+        <tr><td>Validation</td><td>Missing mappings and invalid settings fail visibly.</td></tr>
+        <tr><td>SVG output</td><td>Dynamic values replace placeholders without modifying the master SVG.</td></tr>
+        <tr><td>PDF output</td><td>Inkscape successfully exports all generated sheet pages.</td></tr>
+        <tr><td>Build preservation</td><td><code>mappings.json</code>, <code>template_settings.json</code> and <code>output/</code> survive rebuild.</td></tr>
+        <tr><td>Input/templates choice</td><td>Build Keep/Restore prompts behave as intended.</td></tr>
+        <tr><td>Physical test</td><td>Test print at 100% / Actual Size aligns with the selected label stock.</td></tr>
+      </table>
+
+      <div class="good">
+        If this checklist passes, V1 should be treated as a stable production baseline. Further features should be evaluated as explicit V1.1/V2 work rather than accumulated casually into the production build.
+      </div>
+    </section>
+
+    <footer>
+      MAAH Label Renderer — Internal Technical & Operational Documentation — V1
+    </footer>
+
+  </main>
+</div>
+</body>
+</html>

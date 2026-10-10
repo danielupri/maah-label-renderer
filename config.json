@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1.0",
+  "appVersion": "1.0.0",
+  "defaults": {
+    "artworkScalePct": 95.0,
+    "backgroundColor": "#FFFFFF",
+    "bleedMm": 1.0
+  },
+  "inkscape": {
+    "executablePath": ""
+  }
+}

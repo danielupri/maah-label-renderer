@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "1.0",
+  "global": {
+    "artworkScalePct": 95.0,
+    "backgroundColor": "#FFFFFF",
+    "bleedMm": 1.0
+  },
+  "templates": {}
+}

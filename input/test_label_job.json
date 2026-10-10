@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.0",
+  "labelId": "LAB-0001",
+  "brand": {
+    "title": "MAAH FOOD"
+  },
+  "lot": {
+    "lotId": "L-P001-001",
+    "productName": "Chicken Curry"
+  },
+  "product": {
+    "productId": "P001",
+    "productName": "Chicken Curry",
+    "labelName": "Chicken Curry",
+    "frozenStatus": "Frozen",
+    "netWeightG": 500,
+    "netWeightText": "500 g"
+  },
+  "print": {
+    "formatCode": "L7976",
+    "quantity": 10,
+    "startPosition": 7,
+    "labelsPerSheet": 8
+  }
+}
