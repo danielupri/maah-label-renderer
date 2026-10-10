@@ -3,6 +3,10 @@
 MAAH Label Renderer is a Windows desktop application for generating print-ready
 Avery label sheets from structured JSON data and reusable SVG artwork templates.
 
+MAAH Label Renderer started as a small internal tool to simplify the creation of product labels using Avery sheet formats, JSON data, and reusable SVG artwork templates.  
+I built it mostly through vibe coding, so there may still be bugs, limitations, or parts of the code that could be improved. I’m making it public because it may still be useful for anyone who wants a simple and practical way to generate printable labels without relying on a large or complex labeling system.  
+You are welcome to use it, modify it, and improve it.
+
 ## Features
 
 - JSON-driven label generation
